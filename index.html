@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sockets example</title>
+</head>
+
+<body>
+    <h1 id="my_id"></h1>
+    <br>
+    <input id="to" type="text" placeholder="to:">
+    <input id="message" type="text" placeholder="message">
+    <button id="emit">Emmit</button>
+    <hr>
+    <br>
+    <h1>USUARIOS</h1>
+    <ul id="lista">
+    </ul>
+    <h1>MENSAJES</h1>
+    <ul id="mensajes"></ul>
+    <script src="js/socket.io.js"></script>
+    <script>
+        var id = Math.floor((Math.random() * 100) + 1);
+        document.getElementById('my_id').innerHTML = "My id: " + id;
+
+        var socket = io.connect('http://' + window.location.hostname + ':3000');
+
+        socket.on('users', function (data) {
+            console.log('USERS');
+            console.log(data);
+            var node = document.createElement("LI");
+            var textnode = document.createTextNode(data.connected);
+            node.appendChild(textnode);
+            document.getElementById("lista").appendChild(node);
+        });
+        socket.on('new_message', function (data) {
+            var node = document.createElement("LI");
+            var textnode = document.createTextNode(data.msg);
+            node.appendChild(textnode);
+            document.getElementById("mensajes").appendChild(node);
+            console.log(data);
+        });
+
+
+
+        let button = document.getElementById('emit');
+        button.addEventListener('click', function () {
+            let to = document.getElementById('to').value;
+            let body = document.getElementById('message').value;
+            console.log(to);
+            socket.emit('new_message', {
+                msg: body,
+                receipt: to,
+            });
+        });
+
+    </script>
+</body>
+
+</html>
